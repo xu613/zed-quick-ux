@@ -5,3 +5,7 @@ schema_version = 1
 authors = ["XuXu <375364180@qq.com>"]
 description = "快应用ux着色"
 repository = "https://github.com/xu613/zed-quick-ux.git"
+
+[grammars.vue]
+repository = "https://github.com/tree-sitter-grammars/tree-sitter-vue"
+commit = "7e48557b903a9db9c38cea3b7839ef7e1f36c693"
