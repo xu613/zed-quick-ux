@@ -1,0 +1,7 @@
+id = "zed-quick-ux"
+name = "Zed Quick UX"
+version = "0.0.1"
+schema_version = 1
+authors = ["XuXu <375364180@qq.com>"]
+description = "快应用ux着色"
+repository = "https://github.com/xu613/zed-quick-ux.git"
