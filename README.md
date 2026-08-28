@@ -1,2 +1,9 @@
-# zed-quick-ux
-快应用ux着色的Zed插件
+# Quickapp UX
+
+Quickapp `.ux` language support for Zed.
+
+## Features
+
+- Syntax highlighting for `.ux` files
+- Vue-style template, script, and style injections
+- JavaScript and TypeScript hints inside `<script>` blocks

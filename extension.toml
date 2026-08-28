@@ -1,6 +1,6 @@
-id = "zed-quick-ux"
+id = "quickapp-ux"
 name = "Quickapp UX"
-version = "0.0.1"
+version = "0.1.0"
 schema_version = 1
 authors = ["XuXu <375364180@qq.com>"]
 description = "Quickapp UX coloring, script code hints"
