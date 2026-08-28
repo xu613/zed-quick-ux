@@ -1,10 +1,15 @@
 id = "zed-quick-ux"
-name = "Zed Quick UX"
+name = "Quickapp UX"
 version = "0.0.1"
 schema_version = 1
 authors = ["XuXu <375364180@qq.com>"]
-description = "快应用ux着色"
+description = "Quickapp UX coloring, script code hints"
 repository = "https://github.com/xu613/zed-quick-ux.git"
+
+[language_servers.quick-ux-js-language-server]
+name = "Quickapp UX JavaScript Language Server"
+languages = ["quick.ux"]
+language_ids = { "quick.ux" = "javascript" }
 
 [grammars.vue]
 repository = "https://github.com/tree-sitter-grammars/tree-sitter-vue"
