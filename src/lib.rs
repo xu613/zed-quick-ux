@@ -6,6 +6,10 @@ const SERVER_PATH: &str = "server/quick-ux-js-language-server.js";
 const SERVER_SCRIPT: &str = include_str!("../server/quick-ux-js-language-server.js");
 const TYPESCRIPT_PACKAGE_NAME: &str = "typescript";
 const TYPESCRIPT_VERSION: &str = "6.0.3";
+const PRETTIER_PACKAGE_NAME: &str = "prettier";
+const PRETTIER_VERSION: &str = "3.7.4";
+const PRETTIER_PLUGIN_PACKAGE_NAME: &str = "prettier-plugin-ux";
+const PRETTIER_PLUGIN_VERSION: &str = "0.3.0";
 
 struct QuickUxExtension {
     did_find_server: bool,
@@ -28,15 +32,30 @@ impl QuickUxExtension {
         fs::metadata("node_modules/typescript/lib/typescript.js").is_ok_and(|stat| stat.is_file())
     }
 
+    fn prettier_exists(&self) -> bool {
+        fs::metadata("node_modules/prettier/index.cjs").is_ok_and(|stat| stat.is_file())
+    }
+
+    fn prettier_plugin_exists(&self) -> bool {
+        fs::metadata("node_modules/prettier-plugin-ux/src/index.js")
+            .is_ok_and(|stat| stat.is_file())
+    }
+
+    fn dependencies_exist(&self) -> bool {
+        self.typescript_exists() && self.prettier_exists() && self.prettier_plugin_exists()
+    }
+
     fn ensure_server(&mut self, language_server_id: &zed::LanguageServerId) -> Result<String> {
         self.write_server_script()?;
 
-        if self.did_find_server && self.server_exists() && self.typescript_exists() {
+        if self.did_find_server && self.server_exists() && self.dependencies_exist() {
             return Ok(SERVER_PATH.to_string());
         }
 
         if !self.server_exists() {
-            return Err(format!("missing bundled language server script: {SERVER_PATH}"));
+            return Err(format!(
+                "missing bundled language server script: {SERVER_PATH}"
+            ));
         }
 
         if !self.typescript_exists() {
@@ -49,6 +68,22 @@ impl QuickUxExtension {
                 &zed::LanguageServerInstallationStatus::Downloading,
             );
             zed::npm_install_package(TYPESCRIPT_PACKAGE_NAME, TYPESCRIPT_VERSION)?;
+        }
+
+        if !self.prettier_exists() {
+            zed::set_language_server_installation_status(
+                language_server_id,
+                &zed::LanguageServerInstallationStatus::Downloading,
+            );
+            zed::npm_install_package(PRETTIER_PACKAGE_NAME, PRETTIER_VERSION)?;
+        }
+
+        if !self.prettier_plugin_exists() {
+            zed::set_language_server_installation_status(
+                language_server_id,
+                &zed::LanguageServerInstallationStatus::Downloading,
+            );
+            zed::npm_install_package(PRETTIER_PLUGIN_PACKAGE_NAME, PRETTIER_PLUGIN_VERSION)?;
         }
 
         self.did_find_server = true;

@@ -1,5 +1,7 @@
 const fs = require("fs");
 const path = require("path");
+const prettier = require("prettier");
+const prettierPluginUx = require("prettier-plugin-ux");
 const ts = require("typescript");
 
 let rootPath = process.cwd();
@@ -359,6 +361,35 @@ function hover(params) {
   };
 }
 
+async function formatting(params) {
+  const doc = documentAt(params.textDocument.uri);
+  if (!doc) return null;
+
+  const filePath = pathFromUri(doc.uri);
+  const editorOptions = params.options || {};
+  const config = (await prettier.resolveConfig(filePath)) || {};
+  const formatted = await prettier.format(doc.text, {
+    tabWidth: editorOptions.tabSize || 2,
+    useTabs: editorOptions.insertSpaces === false,
+    ...config,
+    filepath: filePath,
+    parser: "vue",
+    plugins: [prettierPluginUx],
+  });
+
+  if (formatted === doc.text) return [];
+
+  return [
+    {
+      range: {
+        start: { line: 0, character: 0 },
+        end: offsetToPosition(doc.text, doc.text.length),
+      },
+      newText: formatted,
+    },
+  ];
+}
+
 function applyChange(text, change) {
   if (!change.range) {
     return change.text;
@@ -404,6 +435,7 @@ function handleRequest(method, params) {
             triggerCharacters: [".", "'", "\"", "/", "@", "_", "$"],
           },
           definitionProvider: true,
+          documentFormattingProvider: true,
           hoverProvider: true,
         },
       };
@@ -415,6 +447,8 @@ function handleRequest(method, params) {
       return definition(params);
     case "textDocument/hover":
       return hover(params);
+    case "textDocument/formatting":
+      return formatting(params);
     default:
       return null;
   }
@@ -433,10 +467,10 @@ function sendResponse(id, result, error) {
   }
 }
 
-function processMessage(message) {
+async function processMessage(message) {
   if (message.id !== undefined) {
     try {
-      sendResponse(message.id, handleRequest(message.method, message.params || {}));
+      sendResponse(message.id, await handleRequest(message.method, message.params || {}));
     } catch (error) {
       log(error.stack || String(error));
       sendResponse(message.id, null, { code: -32603, message: String(error.message || error) });
@@ -471,7 +505,7 @@ process.stdin.on("data", (chunk) => {
 
     const body = input.slice(bodyStart, bodyEnd).toString("utf8");
     input = input.slice(bodyEnd);
-    processMessage(JSON.parse(body));
+    void processMessage(JSON.parse(body));
   }
 });
 
