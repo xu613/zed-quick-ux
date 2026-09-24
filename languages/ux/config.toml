@@ -1,4 +1,4 @@
-name = "QUICK UX"
+name = "QAUX"
 grammar = "vue"
 path_suffixes = ["ux"]
 block_comment = ["<!-- ", " -->"]

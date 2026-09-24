@@ -8,8 +8,8 @@ repository = "https://github.com/xu613/zed-quick-ux.git"
 
 [language_servers.quick-ux-js-language-server]
 name = "Quickapp UX JavaScript Language Server"
-languages = ["QUICK UX"]
-language_ids = { "QUICK UX" = "javascript" }
+languages = ["QAUX"]
+language_ids = { "QAUX" = "javascript" }
 
 [grammars.vue]
 repository = "https://github.com/tree-sitter-grammars/tree-sitter-vue"
